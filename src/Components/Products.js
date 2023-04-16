@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import "../Styles/Products.scss";
 import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 const Products = () => {
+    const navigate = useNavigate();
     const [products, setProducts] = useState([
         { id: 1, name: "Product 1", price: 10.99 },
         { id: 2, name: "Product 2", price: 19.99 },
@@ -22,26 +24,48 @@ const Products = () => {
         });
         return totalPrice.toFixed(2);
     };
+
+    const handleLogout = () => {
+        navigate("/");
+    };
+
     const handleProcederPago = () => {
-        Swal.fire({
-            title: "Thanks",
-            text: "Wait moment...",
-            showCancelButton: false,
-            showConfirmButton: false,
-            allowOutsideClick: false,
-            allowEscapeKey: false,
-            onOpen: () => {
-                Swal.showLoading();
-                setTimeout(() => {
-                    Swal.hideLoading();
+        if (cartItems.length === 0) {
+            Swal.fire({
+                icon: "error",
+                title: "No products in cart",
+                text: "Please add products to your cart before proceeding to payment.",
+                confirmButtonColor: "#d33",
+            });
+        } else {
+            let timerInterval;
+            Swal.fire({
+                title: "Processing payment",
+                html: "I will close in <b></b> milliseconds.",
+                timer: 2000,
+                timerProgressBar: true,
+                didOpen: () => {
+                    Swal.showLoading();
+                    const b = Swal.getHtmlContainer().querySelector("b");
+                    timerInterval = setInterval(() => {
+                        b.textContent = Swal.getTimerLeft();
+                    }, 100);
+                },
+                willClose: () => {
+                    clearInterval(timerInterval);
                     Swal.fire({
-                        title: "¡You rock!",
-                        text: "Thanks.",
                         icon: "success",
+                        text: "Thanks for your payment :)",
+                        confirmButtonColor: "#39F50B",
                     });
-                }, 2000);
-            },
-        });
+                    setCartItems([]);
+                },
+            }).then((result) => {
+                if (result.dismiss === Swal.DismissReason.timer) {
+                    return;
+                }
+            });
+        }
     };
 
     return (
@@ -53,13 +77,13 @@ const Products = () => {
                         <h2>{product.name}</h2>
                         <p>Price: ${product.price}</p>
                         <button onClick={() => addToCart(product)}>
-                            Add to car
+                            Add to cart
                         </button>
                     </div>
                 ))}
             </div>
             <div className="cart">
-                <h2>Car shop</h2>
+                <h2>Cart</h2>
                 <ul>
                     {cartItems.map((item) => (
                         <li key={item.id}>
@@ -73,6 +97,7 @@ const Products = () => {
                     <p>No products</p>
                 )}
                 <button onClick={handleProcederPago}>Pay</button>
+                <button onClick={handleLogout}>Logout</button>
             </div>
         </div>
     );

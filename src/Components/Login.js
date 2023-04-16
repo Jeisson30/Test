@@ -2,13 +2,15 @@ import React, { useState } from "react";
 import "../Styles/Login.scss";
 import Swal from "sweetalert2";
 import UserData from "../Users.json";
-//import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+//import { useHistory } from "react-router-dom";
 
 const Login = () => {
+    const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isValid, setIsValid] = useState("");
-    //const navigate = useNavigate();
+    // const history = useHistory();
 
     const validateData = (e) => {
         e.preventDefault();
@@ -36,7 +38,8 @@ const Login = () => {
                 text: "Welcome",
                 confirmButtonColor: "#39F50B",
             });
-            //navigate("/Products");
+            navigate("/Products");
+            //history.push("/products");
             console.log("enruta");
             setIsValid(true);
         }
